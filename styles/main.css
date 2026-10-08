@@ -1,0 +1,366 @@
+/* ==========================================================================
+   Prakriti Bio - Core Design System & Foundations
+   Aesthetics: Modern + Natural | Authentic Bioenzymes & Clean Chemistry
+   Strictly NO purple gradients, NO pill buttons, NO tacky emoji icons.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Color Palette - Curated Natural & Editorial Tones */
+  --color-moss-900: #13241C;
+  --color-moss-800: #1B3529;
+  --color-moss-700: #264A3A;
+  --color-moss-600: #386450;
+  --color-moss-500: #4B7E67;
+
+  --color-terracotta-700: #9E4F1B;
+  --color-terracotta-600: #C26322;
+  --color-terracotta-500: #DC7630;
+  --color-terracotta-100: #FAEDE4;
+
+  --color-sage-100: #EEF4F0;
+  --color-sage-200: #DEEAE2;
+  --color-sage-300: #BDD4C6;
+  --color-sage-500: #5C8873;
+
+  --color-sand-50: #FCFBF9;
+  --color-sand-100: #F7F5F0;
+  --color-sand-200: #EFECE4;
+  --color-sand-300: #E2DDD3;
+
+  --color-surface-white: #FFFFFF;
+  --color-text-main: #1C2621;
+  --color-text-muted: #56675E;
+  --color-text-subtle: #7E9086;
+  --color-border: #E5E1D8;
+  --color-border-dark: #C9C3B6;
+
+  --color-success: #2E7D32;
+  --color-success-bg: #EDF7ED;
+  --color-warning: #B76E00;
+  --color-warning-bg: #FFF8E1;
+  --color-danger: #C62828;
+  --color-danger-bg: #FFEBEE;
+
+  /* Typography */
+  --font-serif: 'Newsreader', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Shadows */
+  --shadow-subtle: 0 1px 3px rgba(27, 53, 41, 0.05);
+  --shadow-card: 0 4px 16px rgba(27, 53, 41, 0.06);
+  --shadow-float: 0 12px 32px rgba(27, 53, 41, 0.12);
+  --shadow-modal: 0 20px 48px rgba(19, 36, 28, 0.2);
+
+  /* Radii - Strictly NO pill buttons */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* Layout */
+  --header-height: 72px;
+  --max-width: 1240px;
+  --transition-fast: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Base Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-text-main);
+  background-color: var(--color-sand-50);
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* Accessibility Focus States */
+:focus-visible {
+  outline: 2px solid var(--color-terracotta-600);
+  outline-offset: 2px;
+}
+
+/* Container */
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+/* Typography Helpers */
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.text-editorial {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.section-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-moss-700);
+  background: var(--color-sage-100);
+  padding: 4px 10px;
+  border-radius: var(--radius-xs);
+  margin-bottom: 12px;
+}
+
+.section-heading {
+  font-family: var(--font-serif);
+  font-size: clamp(1.85rem, 3.5vw, 2.75rem);
+  line-height: 1.15;
+  color: var(--color-moss-900);
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.section-subheading {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  max-width: 680px;
+  margin-bottom: 32px;
+}
+
+/* Buttons - Strictly Rectangular with 6-8px radius, NO pill buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 20px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background-color: var(--color-moss-800);
+  color: var(--color-surface-white);
+  border-color: var(--color-moss-800);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-moss-900);
+  border-color: var(--color-moss-900);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(19, 36, 28, 0.15);
+}
+
+.btn-accent {
+  background-color: var(--color-terracotta-600);
+  color: var(--color-surface-white);
+  border-color: var(--color-terracotta-600);
+}
+
+.btn-accent:hover {
+  background-color: var(--color-terracotta-700);
+  border-color: var(--color-terracotta-700);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(194, 99, 34, 0.2);
+}
+
+.btn-secondary {
+  background-color: var(--color-surface-white);
+  color: var(--color-moss-800);
+  border-color: var(--color-border-dark);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-sand-100);
+  border-color: var(--color-moss-700);
+  color: var(--color-moss-900);
+}
+
+.btn-outline-accent {
+  background-color: transparent;
+  color: var(--color-terracotta-600);
+  border-color: var(--color-terracotta-600);
+}
+
+.btn-outline-accent:hover {
+  background-color: var(--color-terracotta-100);
+}
+
+.btn-sm {
+  padding: 7px 13px;
+  font-size: 0.8125rem;
+  border-radius: var(--radius-xs);
+}
+
+.btn-lg {
+  padding: 14px 26px;
+  font-size: 1.0625rem;
+  border-radius: var(--radius-md);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--radius-xs);
+  letter-spacing: 0.02em;
+}
+
+.badge-terracotta {
+  background: var(--color-terracotta-100);
+  color: var(--color-terracotta-700);
+  border: 1px solid rgba(194, 99, 34, 0.2);
+}
+
+.badge-moss {
+  background: var(--color-sage-100);
+  color: var(--color-moss-800);
+  border: 1px solid var(--color-sage-200);
+}
+
+.badge-stock {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.badge-out {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+/* SVG Icon Base */
+.icon {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.75;
+  stroke: currentColor;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+.icon-sm {
+  width: 15px;
+  height: 15px;
+}
+
+.icon-lg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Toast Notifications */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 380px;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--color-surface-white);
+  border: 1px solid var(--color-border);
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-float);
+  animation: toastIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.toast-success {
+  border-left: 4px solid var(--color-success);
+}
+
+.toast-info {
+  border-left: 4px solid var(--color-moss-600);
+}
+
+.toast-warning {
+  border-left: 4px solid var(--color-warning);
+}
+
+.toast-message {
+  font-size: 0.875rem;
+  color: var(--color-text-main);
+  line-height: 1.4;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

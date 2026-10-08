@@ -1,0 +1,664 @@
+﻿PRODUCT REQUIREMENTS DOCUMENT (PRD)
+Organic Cleaning Products E-Commerce Platform
+Version 1.0
+1. PRODUCT OVERVIEW
+Product Name: TBD
+Product Type:
+A modern, natural, e-commerce website for an organization that develops and sells bioenzyme-based and organic cleaning products, while educating customers about environmental sustainability, organic waste reuse, and responsible cleaning.
+Initial Product Catalog:
+1. Bioenzyme
+2. Dishwasher
+3. Laundry Washing Liquid / Detergent Liquid
+4. Shampoo
+5. Floor Cleaner
+The catalog must support additional products later without requiring architectural changes.
+Product Sizes:
+500 ml, 1 L, 2 L, 3 L, 4 L, 5 L, and custom quantity. Customers can directly increase quantity rather than being restricted to predefined package sizes.
+2. PRODUCT VISION
+Create a trustworthy digital storefront combining modern e-commerce, an organic/natural brand identity, environmental education, product transparency, online purchasing, organizational bulk purchasing, environmental activity storytelling, and educational content.
+Core positioning:
+Environmental responsibility + effective cleaning.
+The website must not rely on exaggerated marketing, fabricated statistics, fake testimonials, or unsupported safety/environmental claims.
+3. PRIMARY OBJECTIVES
+Business objectives:
+Sell products online.
+Showcase the complete product catalog.
+Generate customer enquiries.
+Support Andhra Pradesh and Telangana initially.
+Support household and organizational customers.
+Support bulk purchases.
+Build trust around the environmental mission.
+Explain the production process.
+Publish environmental and educational content.
+Establish a professional digital presence.
+Allow routine management without developer involvement.
+Customer objectives:
+Understand the organization and products.
+Explore and compare products.
+Search products and content.
+Add products to cart.
+Purchase multiple products together.
+Purchase large quantities.
+Apply discounts.
+Save products to a wishlist.
+Track orders.
+Request cancellations and returns/refunds according to policy.
+Read verified customer reviews.
+Learn about the production process and environmental activities.
+Contact the organization easily.
+4. TARGET USERS
+Household consumers, environment-conscious consumers, general consumers, and organizations such as hotels, restaurants, offices, schools, apartment communities, institutions, and other businesses.
+5. GEOGRAPHIC SCOPE
+Initial delivery region: Andhra Pradesh + Telangana.
+Future expansion to other Indian states should be supported.
+Business location: TBD.
+6. UX AND DESIGN PRINCIPLES
+Design direction: Modern + Natural.
+The experience should be modern, professional, clean, trustworthy, simple, product-focused, and environmentally conscious.
+Do NOT use:
+Purple gradients
+Pill-shaped buttons
+Fake reviews
+Fake metrics
+Fake customer counters
+Vague hero copy
+Emoji icons
+AI-generated-looking/slop photography
+AI-generated/sloppy marketing copy
+Cursor animations
+Crazy/excessive scroll animations
+"Made with AI" branding/tags
+Use real product and brand assets supplied by the organization.
+7. WEBSITE INFORMATION ARCHITECTURE
+Recommended primary navigation:
+Logo | Shop | Our Story | Our Process | Impact | Journal | Contact | Search | Account | Cart
+Core pages:
+Home
+Shop / Products
+Product Detail
+Our Process
+Our Story / About
+Impact
+Journal / Blog
+Contact
+Cart
+Checkout
+Account
+Order Tracking
+Privacy Policy
+Terms & Conditions
+Shipping Policy
+Returns / Refund Policy
+8. HOMEPAGE
+The homepage must immediately explain what the organization sells and its environmental/product concept.
+Recommended flow:
+1. Hero with clear value proposition and Shop Products CTA.
+2. Featured products.
+3. Explanation of what makes the products different.
+4. From Waste to Product process.
+5. Verified product benefits.
+6. Environmental Impact.
+7. Product usage.
+8. Genuine verified customer reviews.
+9. Latest Journal content.
+10. Bulk / Organization Orders.
+11. Final CTA.
+12. Footer.
+The hero must avoid vague statements and clearly communicate the actual business.
+9. PRODUCT CATALOG
+Initial catalog:
+Bioenzyme
+Dishwasher
+Laundry Washing Liquid / Detergent Liquid
+Shampoo
+Floor Cleaner
+Each product supports:
+Multiple sizes
+Custom quantity
+Price
+Stock
+Product images
+Description
+Ingredients/material information
+Benefits
+Usage
+Safety information
+Environmental information
+Reviews
+Ratings
+Product status
+10. PRODUCT DETAIL PAGE
+Each product has a dedicated page containing:
+Product images
+Product name
+Short description
+Price
+Size/quantity selector
+Custom quantity
+Stock availability
+Add to Cart
+Buy Now
+Benefits
+Ingredients/material information
+How to use
+Safety information
+Environmental information
+Reviews/ratings
+Related products
+FAQ where applicable
+All product claims must be supplied or verified by the organization.
+11. SEARCH AND DISCOVERY
+Site-wide search must cover products and relevant content.
+Product filtering:
+Product type
+Size
+Price
+Availability
+Category
+Sorting:
+Price low to high
+Price high to low
+Newest
+Popularity only where reliable data exists
+12. CART
+Customers can use the cart without logging in.
+Cart must support:
+Multiple products
+Multiple quantities
+Different sizes
+Custom quantities
+Product removal
+Quantity modification
+Price calculation
+Coupon application
+Delivery charge
+Order total
+13. WISHLIST
+Customers can save products to a wishlist.
+Wishlist persistence requires an account.
+14. CUSTOMER AUTHENTICATION
+Customers should be able to browse, search, read blogs, view products, and add products to cart without logging in.
+Recommended flow:
+Browse → Product → Cart → Checkout → Sign in / Create account / Continue as Guest
+After guest purchase, encourage account creation for order history and other features.
+15. CUSTOMER ACCOUNT
+Account functionality:
+Profile
+Contact information
+Saved addresses
+Order history
+Order details
+Order tracking
+Wishlist
+Invoices/receipts
+Returns/refunds
+Cancellation requests
+Review submission
+16. CHECKOUT
+Checkout must support:
+Customer information
+Delivery address
+Order summary
+Quantity
+Coupon
+Delivery charge
+Final total
+Payment selection
+Order confirmation
+Planned payment methods:
+Online payment
+Cash on Delivery
+Payment gateway implementation: TBD / Phase 2.
+17. ORDER MANAGEMENT
+Recommended status timeline:
+Order Placed → Confirmed → Packed → Shipped → Out for Delivery → Delivered
+Additional statuses:
+Cancelled
+Return Requested
+Return Approved
+Returned
+Refund Initiated
+Refund Completed
+18. ORDER TRACKING
+Customers can track orders through their account.
+Both delivery models are supported:
+Organization's own delivery team
+External courier/logistics service
+External courier data should support courier name, tracking number, tracking URL where available, and delivery status.
+19. CANCELLATION, RETURNS AND REFUNDS
+Customers can request cancellations, returns, and refunds.
+Exact eligibility, time limits, reasons, approval rules, and refund policy are TBD and should be configurable.
+20. SHIPPING
+Initial region: Andhra Pradesh + Telangana.
+Delivery charges: TBD.
+Shipping rules should be configurable for future flat-rate, free-threshold, location-based, or quantity/weight-based models.
+21. COUPONS AND PROMOTIONS
+Admin-managed:
+Create/edit/disable coupons
+Percentage or fixed discount
+Validity dates
+Minimum order value
+Usage limits
+Product/category restrictions
+First-order offers
+Bundle promotions
+22. PRODUCT BUNDLES
+Admin-managed combo packs with:
+Bundle contents
+Bundle price
+Availability
+Bundle image
+Description
+Discount
+23. BULK / ORGANIZATION ORDERS
+Normal checkout must support large quantities.
+Organizations can purchase large quantities through the normal cart. An organization representative may contact the customer to coordinate quantity, delivery, pricing, availability, and business requirements.
+24. REVIEWS AND RATINGS
+Only genuine, verified-customer reviews should be accepted.
+Admin can:
+View reviews
+Moderate reviews
+Approve/hide reviews
+Handle inappropriate content
+25. BLOG / JOURNAL
+Admin-managed:
+Create
+Edit
+Save draft
+Publish
+Unpublish
+Delete
+Add featured image
+Categories
+Tags
+Author information
+Potential topics include bioenzymes, organic waste, sustainable cleaning, product education, environmental activities, cleaning guidance, and organization news.
+26. ENVIRONMENTAL ACTIVITIES
+Dedicated content area for:
+Activities
+Projects
+Photos
+Videos
+Dates
+Locations
+Environmental objectives
+Verified measurable outcomes
+No fabricated impact statistics.
+27. OUR PROCESS
+Dedicated page explaining the real production process.
+Potential structure:
+Organic waste → Collection → Processing → Bioenzyme creation → Product formulation → Quality/testing → Finished product → Customer use
+Exact technical methodology must be provided and verified by the organization.
+28. ABOUT / ORGANIZATION
+Content should cover:
+Organization story
+Why it exists
+Mission
+Vision
+Environmental purpose
+Product philosophy
+Team information where appropriate
+Activities
+Future goals
+29. CONTACT
+Include:
+WhatsApp
+Phone
+Email
+Contact form
+Business location/map
+Social channels:
+Instagram
+Facebook
+YouTube
+LinkedIn
+WhatsApp
+Social URLs should be configurable from admin.
+30. NOTIFICATIONS
+Order notifications should support:
+Order confirmation
+Status changes
+Shipment
+Out for delivery
+Delivered
+Cancellation
+Return updates
+Refund updates
+Potential channels:
+Email
+SMS
+WhatsApp
+Providers: TBD.
+31. INVOICES / RECEIPTS
+Generate digital order receipt/invoice after purchase.
+Customers can access receipts from their accounts.
+32. ADMIN DASHBOARD
+Admin dashboard should manage:
+Orders
+Sales
+Products
+Inventory
+Customers
+Reviews
+Coupons
+Blogs
+Environmental activities
+Returns/refunds
+Operational information
+Metrics must be based on actual data.
+33. ADMIN ROLES
+Super Admin:
+Full system access.
+Order Manager:
+Orders, customer order information, statuses, cancellations, returns, refunds.
+Product Manager:
+Products, variants, sizes, prices, stock, product information.
+Content Manager:
+Blogs, environmental activities, pages, media.
+Marketing Manager:
+Coupons, discounts, promotions, bundles.
+Permissions must be configurable and enforced server-side.
+34. INVENTORY
+Admin can:
+Set stock
+Update stock
+Adjust stock
+View stock
+Identify low stock
+Disable unavailable variants
+Mark products out of stock
+Orders should automatically update inventory.
+35. CONTENT MANAGEMENT
+Admin-managed:
+Products
+Variants
+Blogs
+Environmental activities
+Homepage content
+Organization information
+Contact information
+Social links
+Policies
+Promotional content
+Routine changes should not require code changes.
+36. SEO
+Requirements:
+SEO-friendly URLs
+Page titles
+Meta descriptions
+Heading hierarchy
+Product structured data where applicable
+Article structured data where applicable
+Image alt text
+Sitemap
+Robots configuration
+Canonical URLs
+Internal linking
+Optimized product content
+Local SEO once location is finalized
+37. PERFORMANCE
+Prioritize:
+Fast page loading
+Optimized product images
+Responsive images
+Lazy loading where appropriate
+Efficient JavaScript
+Minimal unnecessary animations
+Good Core Web Vitals
+Strong mobile performance
+38. RESPONSIVE DESIGN
+Must support:
+Mobile
+Tablet
+Desktop
+Mobile should be designed intentionally, not merely as a shrunken desktop layout.
+39. ACCESSIBILITY
+Use:
+Semantic HTML
+Keyboard accessibility
+Visible focus states
+Sufficient contrast
+Alt text
+Accessible forms
+Proper labels
+Meaningful button text
+Screen-reader-friendly structure
+40. SECURITY
+Include:
+Secure authentication
+Password hashing
+Role-based authorization
+Protected admin routes
+Input validation
+Server-side validation
+Secure API endpoints
+Protection against common web vulnerabilities
+Secure payment integration when implemented
+Protection of customer information
+41. PRIVACY AND LEGAL
+Required:
+Privacy Policy
+Terms & Conditions
+Shipping Policy
+Returns & Refund Policy
+Exact legal/business wording must be finalized before launch.
+Avoid unsupported claims such as:
+Completely chemical-free
+100% safe
+No side effects
+Guaranteed better than all conventional cleaners
+Guaranteed environmental impact
+Safety, health, environmental, and comparative claims must be verified and approved by the organization.
+42. ANALYTICS
+Future/launch analytics should measure:
+Visitors
+Product views
+Add-to-cart
+Checkout initiation
+Purchases
+Search activity
+Traffic sources
+Blog engagement
+Coupon usage
+43. TECHNICAL ARCHITECTURE
+Exact stack: TBD.
+The architecture should support:
+Modern responsive frontend
+API-driven backend
+Products
+Users
+Orders
+Inventory
+Reviews
+Coupons
+Content
+Admin roles
+Notifications
+A relational data model is recommended for transactional e-commerce data.
+Media storage is required for:
+Product images
+Blog images
+Activity photos
+Brand assets
+Hosting provider: TBD.
+44. CUSTOM DOMAIN AND BRANDING
+Production requirements:
+Custom domain
+HTTPS
+Favicon
+Page metadata
+Social sharing metadata
+No "Made with AI" branding/tag
+45. CORE CUSTOMER JOURNEY
+Discovery
+→ Homepage
+→ Product exploration
+→ Product detail
+→ Size/quantity
+→ Cart
+→ Checkout
+→ Sign in / Create account / Guest
+→ Delivery information
+→ Payment/delivery selection
+→ Order confirmation
+→ Tracking
+→ Delivery
+→ Verified review
+46. CORE ADMIN JOURNEY
+Admin login
+→ Dashboard
+→ New order
+→ Review order
+→ Confirm
+→ Inventory update
+→ Pack
+→ Internal delivery or external courier
+→ Update status
+→ Customer notification
+→ Delivered
+47. PHASE 1
+Priority:
+Homepage
+Product catalog
+Product details
+About
+Process
+Impact
+Blog
+Contact
+Cart
+Product variants
+Quantity/custom quantity
+Wishlist
+Checkout structure
+COD architecture
+Payment architecture ready for later integration
+Order creation
+Order tracking
+Customer accounts
+Admin authentication
+Role-based access
+Product management
+Inventory
+Orders
+Customers
+Blog management
+Impact/activity management
+Coupons
+Bundles
+Reviews
+Responsive UI
+SEO foundations
+Privacy Policy
+Terms & Conditions
+Custom domain readiness
+Favicon
+Security foundations
+48. PHASE 2
+Payment gateway
+Shipping/delivery pricing rules
+Notification providers
+Advanced courier integration
+Advanced analytics
+Additional automation
+Additional products
+Expanded delivery geography
+Advanced marketing features
+49. TBD / PENDING BUSINESS DECISIONS
+Business name
+Final logo/brand confirmation
+Business address
+Exact product formulations
+Product ingredients
+Safety claims
+Environmental claims
+Exact production process
+Product pricing
+Payment gateway
+Shipping charges
+Shipping rules
+Return policy
+Refund policy
+Cancellation rules
+Courier provider
+Notification providers
+Social media URLs
+Domain name
+Final brand copy
+50. NON-GOALS
+Do not add unnecessary complexity such as:
+Artificial social proof
+Fake counters
+Fake reviews
+Excessive animation
+Unnecessary gamification
+Cryptocurrency/payment experiments
+Unnecessary AI chatbot
+Overcomplicated recommendation engine
+Large enterprise logistics system
+Features should be added when there is a real business requirement.
+51. ACCEPTANCE CRITERIA
+Customer:
+Browse without login
+Search products
+Filter/sort
+View product details
+Select sizes
+Specify quantities
+Add multiple products to cart
+Wishlist
+Coupons
+Checkout
+Place orders
+Track orders
+Cancellation where permitted
+Returns/refunds where permitted
+Invoices/receipts
+Verified reviews
+Responsive on mobile/tablet/desktop
+Admin:
+Manage products
+Manage variants
+Manage inventory
+Manage orders
+Manage customers
+Manage reviews
+Create coupons
+Manage bundles
+Publish blogs
+Manage environmental activities
+Manage content
+Role-based permissions
+Unauthorized users cannot access restricted functions
+Brand:
+No fake reviews
+No fake metrics
+No fake customer counts
+No AI branding
+No unsupported product claims
+Real product imagery
+Modern + Natural design
+Custom domain
+Favicon
+Privacy Policy
+Terms & Conditions
+52. SUCCESS CRITERIA
+The website should:
+1. Convert visitors into customers.
+2. Explain the product concept clearly.
+3. Build trust through authentic information.
+4. Make purchasing simple.
+5. Support household and organizational customers.
+6. Educate visitors about environmental activities.
+7. Establish a credible online brand.
+8. Allow the organization to manage products, orders, and content.
+9. Provide a foundation for expansion beyond Andhra Pradesh and Telangana.
+53. GUIDING PRINCIPLE
+The website should never look like an AI-generated template or generic sustainability website.
+It should feel like a real product company with a real environmental purpose.
+Every major element should answer:
+What is the product?
+Why should I trust it?
+How can I buy it?
+The environmental story should strengthen the product experience rather than distract from it.
+The e-commerce experience should remain simple, fast, authentic, and trustworthy.
