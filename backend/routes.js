@@ -94,6 +94,20 @@ function formatOrder(o) {
   };
 }
 
+// Admin Auth & RBAC Check Helper
+function checkAdminAuth(req, res, requiredPermission = null) {
+  const admin = getAuthenticatedAdmin(req);
+  if (!admin) {
+    sendError(res, 'Unauthorized', 401);
+    return null;
+  }
+  if (requiredPermission && !requireAdminPermission(admin, requiredPermission)) {
+    sendError(res, `Forbidden: ${requiredPermission} permission required`, 403);
+    return null;
+  }
+  return admin;
+}
+
 // ROUTE DISPATCHER
 async function handleApiRequest(req, res, pathname, query) {
   const method = req.method.toUpperCase();
@@ -400,7 +414,7 @@ async function handleApiRequest(req, res, pathname, query) {
   }
 
   if (pathname === '/api/auth/logout' && method === 'POST') {
-    const token = getAuthToken(req);
+    const token = getAuthToken(req, 'customer');
     deleteSession(token);
     const clearCookie = 'pb_session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0';
     return sendJson(res, { success: true }, 200, { 'Set-Cookie': clearCookie });
@@ -755,8 +769,10 @@ async function handleApiRequest(req, res, pathname, query) {
     // Allow tracking by ID even if guest with order ID, but if customer is logged in check ownership or let public track by ID
     const order = db.prepare('SELECT * FROM orders WHERE order_id = ?').get(orderId);
     if (!order) return sendError(res, 'Order not found', 404);
-    if (customer && order.customer_id && order.customer_id !== customer.id) {
-      return sendError(res, 'Unauthorized order access', 403);
+    if (order.customer_id) {
+      if (!customer || order.customer_id !== customer.id) {
+        return sendError(res, 'Unauthorized order access. Please log in to view this order.', 403);
+      }
     }
     return sendJson(res, formatOrder(order));
   }
@@ -874,7 +890,7 @@ async function handleApiRequest(req, res, pathname, query) {
 
   if (pathname === '/api/admin/auth/logout' && method === 'POST') {
     const admin = getAuthenticatedAdmin(req);
-    const token = getAuthToken(req);
+    const token = getAuthToken(req, 'admin');
     if (admin) {
       logAudit(admin.id, admin.name, 'ADMIN_LOGOUT', 'admin_auth', admin.id, 'Logged out', 'SUCCESS', clientIp);
     }
@@ -967,8 +983,8 @@ async function handleApiRequest(req, res, pathname, query) {
   // 11. ADMIN ORDER MANAGEMENT
   // -------------------------------------------------------------
   if (pathname === '/api/admin/orders' && method === 'GET') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'orders')) return sendError(res, 'Forbidden: Orders permission required', 403);
+    const admin = checkAdminAuth(req, res, 'orders');
+    if (!admin) return;
 
     let sql = 'SELECT * FROM orders WHERE 1=1';
     const params = [];
@@ -989,8 +1005,8 @@ async function handleApiRequest(req, res, pathname, query) {
   }
 
   if (pathname.startsWith('/api/admin/orders/') && pathname.endsWith('/status') && method === 'PUT') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'orders')) return sendError(res, 'Forbidden: Orders permission required', 403);
+    const admin = checkAdminAuth(req, res, 'orders');
+    if (!admin) return;
 
     const orderId = pathname.replace('/api/admin/orders/', '').replace('/status', '');
     const order = db.prepare('SELECT * FROM orders WHERE order_id = ?').get(orderId);
@@ -1093,8 +1109,9 @@ async function handleApiRequest(req, res, pathname, query) {
   // 12. ADMIN PRODUCT & INVENTORY MANAGEMENT
   // -------------------------------------------------------------
   if (pathname === '/api/admin/products' && method === 'GET') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || (!requireAdminPermission(admin, 'products') && !requireAdminPermission(admin, 'inventory'))) {
+    const admin = checkAdminAuth(req, res);
+    if (!admin) return;
+    if (!requireAdminPermission(admin, 'products') && !requireAdminPermission(admin, 'inventory')) {
       return sendError(res, 'Forbidden: Products permission required', 403);
     }
 
@@ -1103,8 +1120,8 @@ async function handleApiRequest(req, res, pathname, query) {
   }
 
   if (pathname === '/api/admin/products' && method === 'POST') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'products')) return sendError(res, 'Forbidden: Products permission required', 403);
+    const admin = checkAdminAuth(req, res, 'products');
+    if (!admin) return;
 
     const body = await parseBody(req);
     const {
@@ -1162,8 +1179,8 @@ async function handleApiRequest(req, res, pathname, query) {
   }
 
   if (pathname.startsWith('/api/admin/products/') && !pathname.endsWith('/stock') && method === 'PUT') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'products')) return sendError(res, 'Forbidden: Products permission required', 403);
+    const admin = checkAdminAuth(req, res, 'products');
+    if (!admin) return;
 
     const prodId = pathname.replace('/api/admin/products/', '');
     const current = db.prepare('SELECT * FROM products WHERE id = ?').get(prodId);
@@ -1219,8 +1236,8 @@ async function handleApiRequest(req, res, pathname, query) {
 
   // Stock Adjustment
   if (pathname.startsWith('/api/admin/products/') && pathname.endsWith('/stock') && method === 'PUT') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'inventory')) return sendError(res, 'Forbidden: Inventory permission required', 403);
+    const admin = checkAdminAuth(req, res, 'inventory');
+    if (!admin) return;
 
     const prodId = pathname.replace('/api/admin/products/', '').replace('/stock', '');
     const current = db.prepare('SELECT * FROM products WHERE id = ?').get(prodId);
@@ -1271,8 +1288,8 @@ async function handleApiRequest(req, res, pathname, query) {
 
   // Inventory logs
   if (pathname === '/api/admin/inventory/logs' && method === 'GET') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'inventory')) return sendError(res, 'Forbidden: Inventory permission required', 403);
+    const admin = checkAdminAuth(req, res, 'inventory');
+    if (!admin) return;
 
     const logs = db.prepare(`
       SELECT il.*, p.name as product_name
@@ -1287,8 +1304,8 @@ async function handleApiRequest(req, res, pathname, query) {
   // 13. ADMIN CUSTOMER MANAGEMENT
   // -------------------------------------------------------------
   if (pathname === '/api/admin/customers' && method === 'GET') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'customers')) return sendError(res, 'Forbidden: Customers permission required', 403);
+    const admin = checkAdminAuth(req, res, 'customers');
+    if (!admin) return;
 
     let sql = `
       SELECT c.id, c.name, c.email, c.phone, c.status, c.created_at, c.last_login,
@@ -1316,8 +1333,8 @@ async function handleApiRequest(req, res, pathname, query) {
   }
 
   if (pathname.startsWith('/api/admin/customers/') && pathname.endsWith('/status') && method === 'PUT') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'customers')) return sendError(res, 'Forbidden: Customers permission required', 403);
+    const admin = checkAdminAuth(req, res, 'customers');
+    if (!admin) return;
 
     const custId = pathname.replace('/api/admin/customers/', '').replace('/status', '');
     const current = db.prepare('SELECT * FROM customers WHERE id = ?').get(custId);
@@ -1351,15 +1368,15 @@ async function handleApiRequest(req, res, pathname, query) {
   // 14. ADMIN JOURNAL CMS
   // -------------------------------------------------------------
   if (pathname === '/api/admin/journal' && method === 'GET') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'journal')) return sendError(res, 'Forbidden: Journal permission required', 403);
+    const admin = checkAdminAuth(req, res, 'journal');
+    if (!admin) return;
     const rows = db.prepare('SELECT * FROM journal ORDER BY created_at DESC').all();
     return sendJson(res, rows);
   }
 
   if (pathname === '/api/admin/journal' && method === 'POST') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'journal')) return sendError(res, 'Forbidden: Journal permission required', 403);
+    const admin = checkAdminAuth(req, res, 'journal');
+    if (!admin) return;
 
     const body = await parseBody(req);
     const { title, slug, author, readTime, tag, excerpt, content, coverImage, status, seoTitle, seoDescription } = body;
@@ -1395,8 +1412,8 @@ async function handleApiRequest(req, res, pathname, query) {
   }
 
   if (pathname.startsWith('/api/admin/journal/') && method === 'PUT') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'journal')) return sendError(res, 'Forbidden: Journal permission required', 403);
+    const admin = checkAdminAuth(req, res, 'journal');
+    if (!admin) return;
 
     const id = pathname.replace('/api/admin/journal/', '');
     const current = db.prepare('SELECT * FROM journal WHERE id = ?').get(id);
@@ -1431,8 +1448,8 @@ async function handleApiRequest(req, res, pathname, query) {
   }
 
   if (pathname.startsWith('/api/admin/journal/') && method === 'DELETE') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'journal')) return sendError(res, 'Forbidden: Journal permission required', 403);
+    const admin = checkAdminAuth(req, res, 'journal');
+    if (!admin) return;
 
     const id = pathname.replace('/api/admin/journal/', '');
     db.prepare('DELETE FROM journal WHERE id = ?').run(id);
@@ -1444,15 +1461,15 @@ async function handleApiRequest(req, res, pathname, query) {
   // 15. ADMIN COUPONS & PROMOTIONS
   // -------------------------------------------------------------
   if (pathname === '/api/admin/coupons' && method === 'GET') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'coupons')) return sendError(res, 'Forbidden: Coupons permission required', 403);
+    const admin = checkAdminAuth(req, res, 'coupons');
+    if (!admin) return;
     const rows = db.prepare('SELECT * FROM coupons ORDER BY active DESC, id ASC').all();
     return sendJson(res, rows);
   }
 
   if (pathname === '/api/admin/coupons' && method === 'POST') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'coupons')) return sendError(res, 'Forbidden: Coupons permission required', 403);
+    const admin = checkAdminAuth(req, res, 'coupons');
+    if (!admin) return;
 
     const body = await parseBody(req);
     const { code, discountPercent, discountFixed, freeShipping, minOrder, maxDiscount, usageLimit, description } = body;
@@ -1483,8 +1500,8 @@ async function handleApiRequest(req, res, pathname, query) {
   }
 
   if (pathname.startsWith('/api/admin/coupons/') && method === 'PUT') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'coupons')) return sendError(res, 'Forbidden: Coupons permission required', 403);
+    const admin = checkAdminAuth(req, res, 'coupons');
+    if (!admin) return;
 
     const id = pathname.replace('/api/admin/coupons/', '');
     const body = await parseBody(req);
@@ -1497,8 +1514,8 @@ async function handleApiRequest(req, res, pathname, query) {
   }
 
   if (pathname.startsWith('/api/admin/coupons/') && method === 'DELETE') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'coupons')) return sendError(res, 'Forbidden: Coupons permission required', 403);
+    const admin = checkAdminAuth(req, res, 'coupons');
+    if (!admin) return;
 
     const id = pathname.replace('/api/admin/coupons/', '');
     db.prepare('DELETE FROM coupons WHERE id = ?').run(id);
@@ -1510,8 +1527,8 @@ async function handleApiRequest(req, res, pathname, query) {
   // 16. ADMIN ENQUIRIES / LEADS
   // -------------------------------------------------------------
   if (pathname === '/api/admin/enquiries' && method === 'GET') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'enquiries')) return sendError(res, 'Forbidden: Enquiries permission required', 403);
+    const admin = checkAdminAuth(req, res, 'enquiries');
+    if (!admin) return;
 
     let sql = 'SELECT * FROM enquiries WHERE 1=1';
     const params = [];
@@ -1528,8 +1545,8 @@ async function handleApiRequest(req, res, pathname, query) {
   }
 
   if (pathname.startsWith('/api/admin/enquiries/') && method === 'PUT') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'enquiries')) return sendError(res, 'Forbidden: Enquiries permission required', 403);
+    const admin = checkAdminAuth(req, res, 'enquiries');
+    if (!admin) return;
 
     const id = pathname.replace('/api/admin/enquiries/', '');
     const current = db.prepare('SELECT * FROM enquiries WHERE id = ?').get(id);
@@ -1556,8 +1573,8 @@ async function handleApiRequest(req, res, pathname, query) {
   // 17. ADMIN AUDIT LOGS
   // -------------------------------------------------------------
   if (pathname === '/api/admin/audit-logs' && method === 'GET') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'audit_log')) return sendError(res, 'Forbidden: Audit log permission required', 403);
+    const admin = checkAdminAuth(req, res, 'audit_log');
+    if (!admin) return;
 
     let sql = 'SELECT * FROM audit_logs WHERE 1=1';
     const params = [];
@@ -1578,8 +1595,9 @@ async function handleApiRequest(req, res, pathname, query) {
   // 18. ADMIN TEAM MANAGEMENT (Super Admin Only)
   // -------------------------------------------------------------
   if (pathname === '/api/admin/admins' && method === 'GET') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || admin.role !== 'super_admin') return sendError(res, 'Forbidden: Super Admin access required', 403);
+    const admin = checkAdminAuth(req, res);
+    if (!admin) return;
+    if (admin.role !== 'super_admin') return sendError(res, 'Forbidden: Super Admin access required', 403);
 
     const rows = db.prepare('SELECT id, name, email, role, permissions, status, created_at, last_login FROM admins ORDER BY created_at ASC').all();
     const formatted = rows.map(r => {
@@ -1591,8 +1609,9 @@ async function handleApiRequest(req, res, pathname, query) {
   }
 
   if (pathname === '/api/admin/admins' && method === 'POST') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || admin.role !== 'super_admin') return sendError(res, 'Forbidden: Super Admin access required', 403);
+    const admin = checkAdminAuth(req, res);
+    if (!admin) return;
+    if (admin.role !== 'super_admin') return sendError(res, 'Forbidden: Super Admin access required', 403);
 
     const body = await parseBody(req);
     const { name, email, password, role, permissions } = body;
@@ -1625,8 +1644,9 @@ async function handleApiRequest(req, res, pathname, query) {
   }
 
   if (pathname.startsWith('/api/admin/admins/') && method === 'PUT') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || admin.role !== 'super_admin') return sendError(res, 'Forbidden: Super Admin access required', 403);
+    const admin = checkAdminAuth(req, res);
+    if (!admin) return;
+    if (admin.role !== 'super_admin') return sendError(res, 'Forbidden: Super Admin access required', 403);
 
     const targetId = pathname.replace('/api/admin/admins/', '');
     const target = db.prepare('SELECT * FROM admins WHERE id = ?').get(targetId);
@@ -1694,8 +1714,8 @@ async function handleApiRequest(req, res, pathname, query) {
   // 20. ADMIN REPORTS & CSV EXPORT
   // -------------------------------------------------------------
   if (pathname.startsWith('/api/admin/reports/export/') && method === 'GET') {
-    const admin = getAuthenticatedAdmin(req);
-    if (!admin || !requireAdminPermission(admin, 'reports')) return sendError(res, 'Forbidden: Reports permission required', 403);
+    const admin = checkAdminAuth(req, res, 'reports');
+    if (!admin) return;
 
     const type = pathname.replace('/api/admin/reports/export/', '');
     let csv = '';

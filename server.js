@@ -50,6 +50,8 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       return res.end(fs.readFileSync(adminPath));
     }
+    res.writeHead(302, { 'Location': '/#admin' });
+    return res.end();
   }
 
   // 3. Static File Serving

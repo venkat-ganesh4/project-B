@@ -85,21 +85,31 @@ function createNotification(recipientType, recipientId, title, message, link = '
 }
 
 // Auth extractors
-function getAuthToken(req) {
+function getAuthToken(req, preferredType = null) {
   const authHeader = req.headers['authorization'];
   if (authHeader && authHeader.startsWith('Bearer ')) {
     return authHeader.substring(7).trim();
   }
   const cookieHeader = req.headers['cookie'];
   if (cookieHeader) {
+    if (preferredType === 'admin') {
+      const adminMatch = cookieHeader.match(/(?:^|;\s*)pb_admin_session=([^;]+)/);
+      if (adminMatch) return decodeURIComponent(adminMatch[1]);
+    } else if (preferredType === 'customer') {
+      const custMatch = cookieHeader.match(/(?:^|;\s*)pb_session=([^;]+)/);
+      if (custMatch) return decodeURIComponent(custMatch[1]);
+    }
+    // Generic match fallback
     const match = cookieHeader.match(/(?:^|;\s*)pb_session=([^;]+)/);
     if (match) return decodeURIComponent(match[1]);
+    const fallbackAdmin = cookieHeader.match(/(?:^|;\s*)pb_admin_session=([^;]+)/);
+    if (fallbackAdmin) return decodeURIComponent(fallbackAdmin[1]);
   }
   return null;
 }
 
 function getAuthenticatedCustomer(req) {
-  const token = getAuthToken(req);
+  const token = getAuthToken(req, 'customer');
   const session = getSession(token);
   if (!session || session.user_type !== 'customer') return null;
   const customer = db.prepare('SELECT id, name, email, phone, status, addresses, created_at, last_login FROM customers WHERE id = ?').get(session.user_id);
@@ -108,7 +118,7 @@ function getAuthenticatedCustomer(req) {
 }
 
 function getAuthenticatedAdmin(req) {
-  const token = getAuthToken(req);
+  const token = getAuthToken(req, 'admin');
   const session = getSession(token);
   if (!session || session.user_type !== 'admin') return null;
   const admin = db.prepare('SELECT id, name, email, role, permissions, status, avatar, created_at, last_login FROM admins WHERE id = ?').get(session.user_id);
