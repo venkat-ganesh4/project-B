@@ -43,14 +43,19 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  // 2. Admin Route Shorthand
-  if (pathname === '/admin' || pathname === '/admin/') {
+  // 2. Admin & Inventory Route Shorthand
+  if (pathname === '/admin' || pathname === '/admin/' || pathname.startsWith('/admin/')) {
     const adminPath = path.join(__dirname, 'admin.html');
     if (fs.existsSync(adminPath)) {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       return res.end(fs.readFileSync(adminPath));
     }
     res.writeHead(302, { 'Location': '/#admin' });
+    return res.end();
+  }
+
+  if (pathname === '/inventory' || pathname === '/inventory/') {
+    res.writeHead(302, { 'Location': '/admin#inventory' });
     return res.end();
   }
 

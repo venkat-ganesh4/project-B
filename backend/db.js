@@ -249,7 +249,43 @@ function initSchema() {
       ip_address TEXT,
       created_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS product_likes (
+      id TEXT PRIMARY KEY,
+      product_id TEXT NOT NULL,
+      visitor_id TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      UNIQUE(product_id, visitor_id)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_product_likes_prod ON product_likes(product_id);
+    CREATE INDEX IF NOT EXISTS idx_product_likes_visitor ON product_likes(visitor_id);
+
+    CREATE TABLE IF NOT EXISTS site_content (
+      section_key TEXT PRIMARY KEY,
+      content_data TEXT NOT NULL, -- JSON
+      updated_at TEXT NOT NULL,
+      updated_by TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS media_library (
+      id TEXT PRIMARY KEY,
+      filename TEXT NOT NULL,
+      url TEXT NOT NULL,
+      file_size INTEGER,
+      mime_type TEXT,
+      uploaded_by TEXT,
+      created_at TEXT NOT NULL
+    );
   `);
+
+  // Migrations for existing products table
+  try {
+    db.exec('ALTER TABLE products ADD COLUMN likes_count INTEGER DEFAULT 0;');
+  } catch (e) {}
+  try {
+    db.exec('ALTER TABLE products ADD COLUMN low_stock_threshold INTEGER DEFAULT 20;');
+  } catch (e) {}
 }
 
 // Seed Initial Data if tables are empty
@@ -958,6 +994,177 @@ function seedData() {
       now,
       now
     );
+  }
+
+  // 9. Update Super Admin Permissions to include CMS
+  try {
+    const superAdmin = db.prepare("SELECT permissions FROM admins WHERE id = 'admin_super_1'").get();
+    if (superAdmin) {
+      let perms = JSON.parse(superAdmin.permissions || '[]');
+      if (!perms.includes('cms_content')) perms.push('cms_content');
+      if (!perms.includes('media')) perms.push('media');
+      if (!perms.includes('likes')) perms.push('likes');
+      db.prepare("UPDATE admins SET permissions = ? WHERE id = 'admin_super_1'").run(JSON.stringify(perms));
+    }
+  } catch (e) {}
+
+  // 10. Seed Initial Product Likes if none set
+  try {
+    const productsWithoutLikes = db.prepare('SELECT id, likes_count FROM products WHERE likes_count IS NULL OR likes_count = 0').all();
+    const defaultLikesMap = {
+      'bioenzyme-concentrate': 48,
+      'dishwash-liquid': 39,
+      'floor-cleaner': 52,
+      'laundry-detergent': 31,
+      'herbal-shampoo': 27,
+      'bundle-zero-waste-home': 45
+    };
+    for (const p of productsWithoutLikes) {
+      const defaultLikes = defaultLikesMap[p.id] || 20;
+      db.prepare('UPDATE products SET likes_count = ? WHERE id = ?').run(defaultLikes, p.id);
+    }
+  } catch (e) {}
+
+  // 11. Seed Site Content for CMS
+  const contentCount = db.prepare('SELECT COUNT(*) as count FROM site_content').get().count;
+  if (contentCount === 0) {
+    const defaultContent = {
+      announcement_banner: {
+        enabled: true,
+        badge: 'Regional Direct Dispatch',
+        text: 'Handcrafted in AP & Telangana | 100% Non-Toxic Citrus Bioenzymes | Direct Dispatch & Bulk Inquiries Welcome',
+        link: '#contact'
+      },
+      homepage_hero: {
+        tag: 'Authentic Bioenzyme Chemistry',
+        title: 'Pure Citrus Bioenzyme Cleaning, Fermented from Repurposed Fruit Peels',
+        description: 'Cold-brewed through authentic 90-day natural fermentation in Andhra Pradesh and Telangana. Zero synthetic surfactants, zero artificial fragrances, 100% greywater safe.',
+        ctaPrimaryText: 'Explore Product Catalogue',
+        ctaPrimaryLink: '#shop',
+        ctaSecondaryText: 'Our 90-Day Process',
+        ctaSecondaryLink: '#process',
+        badge: 'Zero Synthetics • 100% Plant & Enzyme Active',
+        bgImage: 'assets/images/hero.jpg'
+      },
+      homepage_pillars: [
+        {
+          tag: 'Fermentation',
+          title: '90-Day Cold Fermentation',
+          description: 'No quick chemical accelerants or boiled syrups. Enzymes develop naturally under ambient southern warmth, producing rich multi-enzyme blends.'
+        },
+        {
+          tag: 'Circularity',
+          title: 'Local Fruit Stall Waste Rescue',
+          description: 'We collect fresh sweet lime (Mosambi) and orange rinds from local juice vendors in Hyderabad and Vijayawada every morning.'
+        },
+        {
+          tag: 'Eco Safety',
+          title: '100% Greywater & River Safe',
+          description: 'Runoff nourishes soil microbes and breaks down organic sludge in drains instead of causing algal blooms in freshwater bodies.'
+        }
+      ],
+      homepage_process_highlights: [
+        {
+          step: '1',
+          title: 'Daily Peel Rescue',
+          desc: 'Sorting fresh sweet lime and orange peels directly from verified fruit juice stalls.'
+        },
+        {
+          step: '2',
+          title: 'Jaggery Ferment',
+          desc: 'Fermented with mineral-rich unrefined black jaggery and pure water for 90 days.'
+        },
+        {
+          step: '3',
+          title: 'Multi-Stage Filtration',
+          desc: 'Gravity-filtered through natural mesh, retaining active catalytic bioenzymes.'
+        },
+        {
+          step: '4',
+          title: 'Eco-Packaging',
+          desc: 'Bottled in reusable, recyclable containers and dispatched directly across AP & Telangana.'
+        }
+      ],
+      homepage_impact_banner: {
+        heading: 'Circularity in Numbers Across AP & Telangana',
+        subtext: 'Every batch represents real organic citrus waste diverted from landfills.',
+        metrics: [
+          { value: '14,800+', label: 'Kg Citrus Peels Diverted' },
+          { value: '90 Days', label: 'Pure Fermentation Time' },
+          { value: '100%', label: 'Greywater & Soil Safe' },
+          { value: '0g', label: 'Synthetic Phosphates or SLS' }
+        ]
+      },
+      about_story: {
+        heading: 'Brewed from Respect for Living Microbes and Clean Waterways',
+        subheading: 'The Prakriti Bio Story',
+        lead: 'Prakriti Bio was born out of a simple observation in the fruit markets of Hyderabad and Vijayawada: thousands of kilograms of nutrient-dense citrus rinds were discarded daily, while households washed toxic petrochemicals down their drains.',
+        paragraphs: [
+          'Traditional cleaning products are packed with synthetic linear alkylbenzene sulfonates, chemical brighteners, and synthetic perfumes that irritate sensitive skin, trigger respiratory distress in pets, and contaminate groundwater.',
+          'By repurposing discarded sweet lime (Mosambi) and orange peels, we initiate an ancient 90-day wild fermentation process. Benefited by unrefined black jaggery, beneficial microbes break down complex sugars into an army of active enzymes—Lipase, Amylase, and Protease—that dissolve stubborn grease, grime, and bathroom scale without toxic residues.',
+          'Today, we handcraft natural cleaning products across Andhra Pradesh and Telangana for mindful homes, organic cafes, schools, and sustainable residential communities.'
+        ],
+        mission: 'To eradicate hazardous household petrochemicals from homes and drains across Southern India while establishing circular waste pipelines.'
+      },
+      about_process: {
+        heading: 'The 90-Day Fermentation & Purification Journey',
+        subheading: 'How discarded citrus peels become potent, food-grade bioenzymes.',
+        stages: [
+          {
+            stage: 'Stage 01: Sourcing & Sterilization',
+            detail: 'Fresh peels collected daily from trusted local juice stalls in Hyderabad and Vijayawada. Washed in natural salt solution to remove dust.'
+          },
+          {
+            stage: 'Stage 02: 1:3:10 Fermentation Blend',
+            detail: 'Measured strictly by weight: 1 part unrefined black jaggery, 3 parts fresh citrus peels, and 10 parts de-chlorinated purified water.'
+          },
+          {
+            stage: 'Stage 03: 90-Day Ambient Fermentation',
+            detail: 'Stored in food-grade, gas-vented maturation vats for three months. Gas release monitored daily as wild yeasts and probiotic cultures proliferate.'
+          },
+          {
+            stage: 'Stage 04: Multi-Stage Clarification',
+            detail: 'Slow gravity micro-filtration separates the clear golden enzymatic liquid from solid residues. The spent solids become nutrient-dense garden compost.'
+          },
+          {
+            stage: 'Stage 05: Quality & Potency Verification',
+            detail: 'Every batch is tested for target pH (3.5 - 4.0), enzyme concentration, and natural botanical stability before direct bottling.'
+          }
+        ]
+      },
+      impact_page: {
+        heading: 'Tangible Ecological Impact Across AP & Telangana',
+        subheading: 'Transforming municipal organic waste into restorative microbial solutions.',
+        lead: 'Our goal is simple: zero waste to landfills, zero toxic runoff to waterways.',
+        stats: [
+          { number: '14,800+ kg', label: 'Citrus Waste Repurposed', description: 'Diverted from city landfills in Hyderabad and Vijayawada.' },
+          { number: '42,000+ L', label: 'Greywater Protected', description: 'Prevented chemical contamination in domestic and municipal drain systems.' },
+          { number: '3,200+ kg', label: 'Organic Compost Created', description: 'Spent ferment solids donated to local organic farmers and urban terraces.' }
+        ],
+        initiatives: [
+          { title: 'Fruit Stall Waste Collection Network', desc: 'Collaborating with over 35 local fruit juice vendors, paying fair compensation for clean separated citrus peels.' },
+          { title: 'Gated Community Mopping Transitions', desc: 'Assisting apartment societies across Hyderabad and Visakhapatnam in replacing toxic floor cleaners with bioenzymes.' },
+          { title: 'School Eco-Education Workshops', desc: 'Educating students on bioenzyme fermentation, DIY composting, and chemical-free housekeeping.' }
+        ]
+      },
+      footer_content: {
+        brandTagline: 'Artisanal bioenzyme cleaners crafted from repurposed citrus peels. Non-toxic, greywater-safe, and handcrafted across Telangana and Andhra Pradesh.',
+        phone: '+91-98480-22314',
+        email: 'contact@prakritibio.in',
+        address: 'Plot 42, Bio-Innovation Cluster, Nacharam Industrial Area, Hyderabad, Telangana 500076',
+        operatingHours: 'Monday - Saturday: 9:00 AM - 6:00 PM IST',
+        copyright: '© 2026 Prakriti Bio. Crafted with circular bio-science in AP & Telangana. All rights reserved.'
+      }
+    };
+
+    const insertContent = db.prepare(`
+      INSERT INTO site_content (section_key, content_data, updated_at, updated_by)
+      VALUES (?, ?, ?, 'System Initializer')
+    `);
+
+    for (const [key, val] of Object.entries(defaultContent)) {
+      insertContent.run(key, JSON.stringify(val), now);
+    }
   }
 }
 

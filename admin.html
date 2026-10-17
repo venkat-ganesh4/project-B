@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prakriti Bio | Admin Console & Content Management System</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231B3529'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z'/></svg>" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="styles/components.css" />
+  <link rel="stylesheet" href="styles/admin.css" />
+</head>
+<body class="admin-body">
+
+  <!-- =========================================================================
+       1. ADMIN LOGIN VIEW
+       ========================================================================= -->
+  <div id="admin-login-view" class="admin-login-wrapper">
+    <div class="admin-login-card">
+      <div class="admin-login-header">
+        <div class="brand-symbol">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+        </div>
+        <h1>Prakriti Bio Portal</h1>
+        <p>Operations, Content CMS & Inventory Console</p>
+      </div>
+
+      <div class="admin-demo-creds">
+        <strong>Demo Administrator Access:</strong><br>
+        Email: <code>admin@prakritibio.in</code><br>
+        Password: <code>Admin@Prakriti2026!</code>
+        <div style="margin-top: 8px;">
+          <button type="button" class="btn btn-sm btn-secondary" style="font-size: 0.75rem; padding: 2px 8px;" onclick="document.getElementById('login-email').value='admin@prakritibio.in'; document.getElementById('login-password').value='Admin@Prakriti2026!';">Auto-fill Credentials</button>
+        </div>
+      </div>
+
+      <div id="admin-login-error" class="badge-outofstock" style="display: none; padding: 10px; margin-bottom: 16px; border-radius: 4px; text-align: center;"></div>
+
+      <form onsubmit="AdminApp.handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Administrator Email</label>
+          <input type="email" id="login-email" name="email" class="form-input" required placeholder="admin@prakritibio.in" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="login-password" name="password" class="form-input" required placeholder="••••••••••••" />
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; height: 46px; margin-top: 8px;">
+          Sign In to Console
+        </button>
+      </form>
+
+      <div style="margin-top: 20px; text-align: center; font-size: 0.8125rem;">
+        <a href="/" style="color: var(--color-moss-800); text-decoration: underline;">← Return to Public Storefront</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       2. ADMIN MAIN CONSOLE LAYOUT
+       ========================================================================= -->
+  <div id="admin-portal-view" class="admin-layout" style="display: none;">
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar-brand">
+        <div class="brand-symbol" style="width: 28px; height: 28px;">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+        </div>
+        <div class="brand-name">
+          <span class="brand-title">Prakriti Bio</span>
+          <span class="brand-subtitle" style="font-size: 0.625rem;">Operations Hub</span>
+        </div>
+      </div>
+
+      <nav class="admin-sidebar-menu">
+        <a class="admin-nav-item active" data-tab="dashboard" onclick="AdminApp.switchTab('dashboard')">
+          <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          <span>Dashboard</span>
+        </a>
+
+        <a class="admin-nav-item" data-tab="cms" onclick="AdminApp.switchTab('cms')">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          <span>Site Content CMS</span>
+        </a>
+
+        <a class="admin-nav-item" data-tab="inventory" onclick="AdminApp.switchTab('inventory')">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          <span>Inventory & Stock</span>
+        </a>
+
+        <a class="admin-nav-item" data-tab="products" onclick="AdminApp.switchTab('products')">
+          <svg class="nav-icon" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+          <span>Product Catalogue</span>
+        </a>
+
+        <a class="admin-nav-item" data-tab="journal" onclick="AdminApp.switchTab('journal')">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          <span>Science & Articles</span>
+        </a>
+
+        <a class="admin-nav-item" data-tab="likes" onclick="AdminApp.switchTab('likes')">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          <span>Likes & Community</span>
+        </a>
+
+        <a class="admin-nav-item" data-tab="admins" onclick="AdminApp.switchTab('admins')">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <span>Team & RBAC</span>
+        </a>
+
+        <a class="admin-nav-item" data-tab="audit" onclick="AdminApp.switchTab('audit')">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <span>Audit Logs</span>
+        </a>
+
+        <a class="admin-nav-item" data-tab="hosting" onclick="AdminApp.switchTab('hosting')">
+          <svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+          <span>Hosting & Server</span>
+        </a>
+      </nav>
+
+      <div class="admin-sidebar-footer">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #4CAF50;"></span>
+          <span>Node.js SQLite Active</span>
+        </div>
+        <div>DB: <code>data/prakriti.db</code></div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <!-- Topbar -->
+      <header class="admin-topbar">
+        <div class="admin-topbar-left">
+          <h1 id="admin-topbar-title" class="admin-page-title">Operations & Performance Dashboard</h1>
+        </div>
+
+        <div class="admin-topbar-right">
+          <a href="/" target="_blank" class="btn btn-secondary btn-sm" title="Open live customer website">
+            View Public Store ↗
+          </a>
+
+          <div class="admin-user-badge">
+            <div id="admin-user-avatar" class="admin-user-avatar">A</div>
+            <div>
+              <div id="admin-user-name" style="font-size: 0.8125rem; font-weight: 700; color: var(--color-moss-900);">Admin</div>
+              <div id="admin-user-role" style="font-size: 0.6875rem; color: var(--color-text-subtle);">Super Admin</div>
+            </div>
+          </div>
+
+          <button class="btn btn-secondary btn-sm" onclick="AdminApp.handleLogout()" title="Log out of admin session">
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <!-- View Panes -->
+      <div class="admin-content-view">
+        
+        <!-- PANE 1: DASHBOARD -->
+        <div id="pane-dashboard" class="admin-tab-pane">
+          <!-- KPI Stats -->
+          <div class="admin-stat-grid-4">
+            <div class="admin-card">
+              <span style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase;">Catalogue</span>
+              <div id="stat-total-products" style="font-size: 1.75rem; font-weight: 700; color: var(--color-moss-900); margin: 4px 0;">0</div>
+              <span id="stat-active-products" style="font-size: 0.75rem; color: var(--color-moss-700);">Published products</span>
+            </div>
+
+            <div class="admin-card">
+              <span style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase;">Warehouse Units</span>
+              <div id="stat-total-units" style="font-size: 1.75rem; font-weight: 700; color: var(--color-moss-900); margin: 4px 0;">0</div>
+              <span id="stat-inventory-val" style="font-size: 0.75rem; color: var(--color-success); font-weight: 600;">₹0 Valuation</span>
+            </div>
+
+            <div class="admin-card">
+              <span style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase;">Low Stock Watch</span>
+              <div id="stat-low-stock" style="font-size: 1.75rem; font-weight: 700; color: var(--color-warning); margin: 4px 0;">0</div>
+              <span style="font-size: 0.75rem; color: var(--color-danger);"><span id="stat-out-of-stock">0</span> completely out of stock</span>
+            </div>
+
+            <div class="admin-card">
+              <span style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase;">Total Visitor Likes</span>
+              <div id="stat-total-likes" style="font-size: 1.75rem; font-weight: 700; color: #E53E3E; margin: 4px 0;">0</div>
+              <span style="font-size: 0.75rem; color: var(--color-text-muted);">From AP & Telangana visitors</span>
+            </div>
+          </div>
+
+          <!-- Secondary Grid -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <!-- Top Liked Products Leaderboard -->
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div>
+                  <h3>❤️ Most Liked Products Leaderboard</h3>
+                  <p style="font-size: 0.8125rem; color: var(--color-text-muted);">Real-time customer favorites across Andhra Pradesh & Telangana</p>
+                </div>
+              </div>
+              <div id="dashboard-likes-leaderboard">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- Recent Activity Stream -->
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div>
+                  <h3>📜 Recent Administrator Activity</h3>
+                  <p style="font-size: 0.8125rem; color: var(--color-text-muted);">Audit trail of catalog, CMS, and stock adjustments</p>
+                </div>
+                <button class="btn btn-sm btn-secondary" onclick="AdminApp.switchTab('audit')">View All</button>
+              </div>
+              <div id="dashboard-recent-activity">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 2: SITE CONTENT CMS -->
+        <div id="pane-cms" class="admin-tab-pane" style="display: none;">
+          <div class="admin-subtabs">
+            <button class="admin-subtab cms-section-btn active" data-section="announcement_banner" onclick="AdminApp.switchCmsSection('announcement_banner')">📣 Announcement Bar</button>
+            <button class="admin-subtab cms-section-btn" data-section="homepage_hero" onclick="AdminApp.switchCmsSection('homepage_hero')">🌟 Homepage Hero</button>
+            <button class="admin-subtab cms-section-btn" data-section="homepage_pillars" onclick="AdminApp.switchCmsSection('homepage_pillars')">🏛️ Difference Pillars</button>
+            <button class="admin-subtab cms-section-btn" data-section="about_story" onclick="AdminApp.switchCmsSection('about_story')">📖 Our Story (About)</button>
+            <button class="admin-subtab cms-section-btn" data-section="about_process" onclick="AdminApp.switchCmsSection('about_process')">🔬 90-Day Process Page</button>
+            <button class="admin-subtab cms-section-btn" data-section="footer_content" onclick="AdminApp.switchCmsSection('footer_content')">🦶 Site Footer</button>
+          </div>
+
+          <div id="cms-editor-container">
+            <!-- Rendered dynamically by AdminApp.renderCmsSection() -->
+          </div>
+        </div>
+
+        <!-- PANE 3: INVENTORY & STOCK -->
+        <div id="pane-inventory" class="admin-tab-pane" style="display: none;">
+          <!-- Summary Cards -->
+          <div class="admin-stat-grid-5">
+            <div class="admin-card">
+              <span style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase;">Total Units in Stock</span>
+              <div id="inv-total-units" style="font-size: 1.6rem; font-weight: 700; color: var(--color-moss-900); margin: 4px 0;">0</div>
+              <span style="font-size: 0.75rem; color: var(--color-moss-700);">Across 6 product lines</span>
+            </div>
+
+            <div class="admin-card">
+              <span style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase;">Inventory Valuation</span>
+              <div id="inv-total-valuation" style="font-size: 1.6rem; font-weight: 700; color: var(--color-success); margin: 4px 0;">₹0</div>
+              <span style="font-size: 0.75rem; color: var(--color-text-subtle);">Based on base retail pricing</span>
+            </div>
+
+            <div class="admin-card">
+              <span style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase;">Healthy Stock</span>
+              <div id="inv-healthy-count" style="font-size: 1.6rem; font-weight: 700; color: var(--color-success); margin: 4px 0;">0</div>
+              <span style="font-size: 0.75rem; color: var(--color-success);">Above alert threshold</span>
+            </div>
+
+            <div class="admin-card">
+              <span style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase;">Low Stock Alert</span>
+              <div id="inv-low-count" style="font-size: 1.6rem; font-weight: 700; color: var(--color-warning); margin: 4px 0;">0</div>
+              <span style="font-size: 0.75rem; color: var(--color-warning);">Near threshold</span>
+            </div>
+
+            <div class="admin-card">
+              <span style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase;">Out of Stock</span>
+              <div id="inv-out-count" style="font-size: 1.6rem; font-weight: 700; color: var(--color-danger); margin: 4px 0;">0</div>
+              <span style="font-size: 0.75rem; color: var(--color-danger);">Zero units remaining</span>
+            </div>
+          </div>
+
+          <!-- Stock Level Chart -->
+          <div class="chart-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div>
+                <h3 style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--color-moss-900); margin: 0;">Warehouse Stock Levels vs Alert Line</h3>
+                <p style="font-size: 0.8125rem; color: var(--color-text-muted); margin-top: 2px;">Visual inventory distribution. Dashed line denotes low-stock warning threshold.</p>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <a href="/api/admin/inventory/export" class="btn btn-secondary btn-sm" download>
+                  Export Status (CSV)
+                </a>
+                <a href="/api/admin/inventory/logs/export" class="btn btn-secondary btn-sm" download>
+                  Export Movement Log (CSV)
+                </a>
+              </div>
+            </div>
+            <div id="inventory-chart-canvas"></div>
+          </div>
+
+          <!-- Inventory Products Table -->
+          <div class="admin-card" style="margin-bottom: 24px;">
+            <div class="admin-card-header">
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <h3 style="margin: 0;">Product Stock Quantities</h3>
+                <div class="admin-subtabs" style="margin-bottom: 0; border: none;">
+                  <button class="admin-subtab inv-filter-btn active" data-filter="all" onclick="AdminApp.setInventoryFilter('all')">All Products</button>
+                  <button class="admin-subtab inv-filter-btn" data-filter="low" onclick="AdminApp.setInventoryFilter('low')">Low Stock Watch</button>
+                  <button class="admin-subtab inv-filter-btn" data-filter="out" onclick="AdminApp.setInventoryFilter('out')">Out of Stock</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="admin-table-container">
+              <table class="admin-data-table">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Current Units</th>
+                    <th>Stock Health</th>
+                    <th>Base Price</th>
+                    <th>Valuation</th>
+                    <th>Alert Threshold</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="inventory-table-body">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Inventory Movement Logs -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div>
+                <h3>Stock Movement History Audit</h3>
+                <p style="font-size: 0.8125rem; color: var(--color-text-muted);">Historical log of all stock additions, removals, sample write-offs, and batch maturation.</p>
+              </div>
+            </div>
+
+            <div class="admin-table-container">
+              <table class="admin-data-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Product</th>
+                    <th>Change Units</th>
+                    <th>Previous → New</th>
+                    <th>Reason / Activity</th>
+                    <th>Admin User</th>
+                  </tr>
+                </thead>
+                <tbody id="inventory-logs-table-body">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 4: PRODUCT CATALOGUE -->
+        <div id="pane-products" class="admin-tab-pane" style="display: none;">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div>
+                <h3>Product Catalogue Management</h3>
+                <p style="font-size: 0.8125rem; color: var(--color-text-muted);">Add, edit specifications, prices, ingredients, and publish/draft state.</p>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="AdminApp.openAddProductModal()">+ Add New Product</button>
+            </div>
+
+            <div class="admin-table-container">
+              <table class="admin-data-table">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Base Price</th>
+                    <th>Stock Units</th>
+                    <th>Visitor Likes</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-products-catalog-tbody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 5: JOURNAL CMS -->
+        <div id="pane-journal" class="admin-tab-pane" style="display: none;">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div>
+                <h3>Science, Fermentation & Journal Articles</h3>
+                <p style="font-size: 0.8125rem; color: var(--color-text-muted);">Manage educational guides, bioenzyme chemistry, and municipal waste reduction articles.</p>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="AdminApp.openAddArticleModal()">+ Publish Article</button>
+            </div>
+
+            <div class="admin-table-container">
+              <table class="admin-data-table">
+                <thead>
+                  <tr>
+                    <th>Article Title</th>
+                    <th>Author</th>
+                    <th>Tag</th>
+                    <th>Read Time</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-journal-tbody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 6: LIKES & COMMUNITY -->
+        <div id="pane-likes" class="admin-tab-pane" style="display: none;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div>
+                  <h3>❤️ Product Likes Leaderboard</h3>
+                  <p style="font-size: 0.8125rem; color: var(--color-text-muted);">Aggregated visitor likes stored in SQLite without duplicate votes.</p>
+                </div>
+              </div>
+              <div id="likes-full-leaderboard">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div>
+                  <h3>Customer & Institutional Leads</h3>
+                  <p style="font-size: 0.8125rem; color: var(--color-text-muted);">Direct messages and B2B bulk quote requests.</p>
+                </div>
+              </div>
+              <p style="font-size: 0.875rem; color: var(--color-text-muted); line-height: 1.6;">
+                Review incoming institutional mopping requests from apartment complexes, hotels, and schools across Hyderabad, Secunderabad, and Vijayawada. Update contact status directly from the table below.
+              </p>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h3>Customer Enquiries & B2B Bulk Quotes</h3>
+            </div>
+            <div class="admin-table-container">
+              <table class="admin-data-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Contact Info</th>
+                    <th>Type</th>
+                    <th>Message Snippet</th>
+                    <th>Current Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-enquiries-tbody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 7: TEAM & RBAC -->
+        <div id="pane-admins" class="admin-tab-pane" style="display: none;">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div>
+                <h3>Team & Role-Based Access Control (RBAC)</h3>
+                <p style="font-size: 0.8125rem; color: var(--color-text-muted);">Super admin console for managing administrator accounts and granular permissions.</p>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="AdminApp.openAddAdminModal()">+ Add Team Member</button>
+            </div>
+
+            <div class="admin-table-container">
+              <table class="admin-data-table">
+                <thead>
+                  <tr>
+                    <th>Administrator</th>
+                    <th>Role</th>
+                    <th>Granular Permissions</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-team-tbody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 8: AUDIT LOGS -->
+        <div id="pane-audit" class="admin-tab-pane" style="display: none;">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div>
+                <h3>Security & Operational Audit Stream</h3>
+                <p style="font-size: 0.8125rem; color: var(--color-text-muted);">Complete immutable log of administrator logins, catalog changes, content updates, and inventory adjustments.</p>
+              </div>
+            </div>
+
+            <div class="admin-table-container">
+              <table class="admin-data-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Admin Name</th>
+                    <th>Action Type</th>
+                    <th>Target</th>
+                    <th>Details Summary</th>
+                    <th>Result</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-audit-tbody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 9: HOSTING & ARCHITECTURE -->
+        <div id="pane-hosting" class="admin-tab-pane" style="display: none;">
+          <div class="admin-card" style="margin-bottom: 24px;">
+            <div class="admin-card-header">
+              <div>
+                <h3>Hosting Architecture & Production Deployment</h3>
+                <p style="font-size: 0.8125rem; color: var(--color-text-muted);">Why GitHub Pages cannot run a backend & how to host this full-stack application</p>
+              </div>
+            </div>
+
+            <div style="background: var(--color-warning-bg); border: 1px solid #FFE082; padding: 18px; border-radius: var(--radius-xs); margin-bottom: 20px;">
+              <h4 style="color: var(--color-warning); margin-bottom: 6px;">Why GitHub Pages Cannot Run This Application's Backend</h4>
+              <p style="font-size: 0.875rem; color: #5D4037; line-height: 1.6; margin: 0;">
+                <strong>GitHub Pages is an exclusively static web host.</strong> It serves pre-compiled HTML, CSS, client JavaScript, and images. It does <em>not</em> run Node.js processes, execute <code>server.js</code>, or support server-side SQLite databases. Any changes made in this Admin CMS or Inventory would be lost or impossible without an active Node.js server to handle API routes and persist data to <code>data/prakriti.db</code>.
+              </p>
+            </div>
+
+            <h4 style="font-family: var(--font-serif); font-size: 1.25rem; color: var(--color-moss-900); margin: 20px 0 10px;">Recommended Production Hosting Options</h4>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+              <div class="admin-card" style="background: var(--color-sand-50);">
+                <span class="badge badge-terracotta" style="margin-bottom: 8px;">Option 1 (Easiest)</span>
+                <h4>Render.com Web Service</h4>
+                <p style="font-size: 0.8125rem; color: var(--color-text-muted); line-height: 1.5; margin: 8px 0 12px;">
+                  1-Click zero-config deployment. Connect your GitHub repository, choose <strong>Node</strong> runtime, set Start Command to <code>node server.js</code>, and attach a persistent disk for <code>data/</code>.
+                </p>
+                <div style="font-size: 0.75rem; background: #fff; padding: 8px; border-radius: 4px; border: 1px solid var(--color-border); font-family: monospace;">
+                  Build: npm install<br>
+                  Start: node server.js
+                </div>
+              </div>
+
+              <div class="admin-card" style="background: var(--color-sand-50);">
+                <span class="badge badge-stock" style="margin-bottom: 8px;">Option 2 (Modern Cloud)</span>
+                <h4>Railway.app / Fly.io</h4>
+                <p style="font-size: 0.8125rem; color: var(--color-text-muted); line-height: 1.5; margin: 8px 0 12px;">
+                  Instant containerized deployment from Git. Automatically detects Node 24 and provisions high-speed storage for SQLite WAL mode.
+                </p>
+                <div style="font-size: 0.75rem; background: #fff; padding: 8px; border-radius: 4px; border: 1px solid var(--color-border); font-family: monospace;">
+                  PORT: 3000<br>
+                  Persistent Volume: /data
+                </div>
+              </div>
+
+              <div class="admin-card" style="background: var(--color-sand-50);">
+                <span class="badge badge-terracotta" style="margin-bottom: 8px;">Option 3 (High Performance)</span>
+                <h4>Ubuntu VPS (DigitalOcean / Hetzner)</h4>
+                <p style="font-size: 0.8125rem; color: var(--color-text-muted); line-height: 1.5; margin: 8px 0 12px;">
+                  Run via PM2 process manager behind an NGINX reverse proxy with free Let's Encrypt SSL. Unlimited requests, zero cost limits.
+                </p>
+                <div style="font-size: 0.75rem; background: #fff; padding: 8px; border-radius: 4px; border: 1px solid var(--color-border); font-family: monospace;">
+                  pm2 start server.js --name "prakriti"<br>
+                  pm2 save
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- =========================================================================
+       3. MODALS (STOCK ADJUST, THRESHOLD, PRODUCT EDIT, ARTICLE EDIT, TEAM)
+       ========================================================================= -->
+
+  <!-- Stock Adjust Modal -->
+  <div id="stock-adjust-modal" class="modal-overlay" role="dialog">
+    <div class="modal-content-card" style="max-width: 520px; padding: 32px;">
+      <button class="modal-close-btn" onclick="AdminApp.closeStockAdjustModal()">✕</button>
+      <h2 style="font-family: var(--font-serif); font-size: 1.5rem; color: var(--color-moss-900); margin-bottom: 6px;">Adjust Product Inventory</h2>
+      <p id="modal-stock-prod-title" style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 20px;"></p>
+
+      <form onsubmit="AdminApp.handleStockAdjustSubmit(event)">
+        <input type="hidden" id="modal-stock-prod-id" />
+
+        <div class="form-group">
+          <label class="form-label">Adjustment Action</label>
+          <select id="modal-stock-action" class="form-select">
+            <option value="add">+ Add Stock (Restock / Ferment Batch)</option>
+            <option value="remove">− Remove Stock (Sample / Waste / Dispatched)</option>
+            <option value="set">Set Exact Count (Physical Inventory Audit)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Quantity (Units)</label>
+          <input type="number" id="modal-stock-amount" class="form-input" min="0" required placeholder="e.g. 50" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Reason / Event</label>
+          <input type="text" id="modal-stock-reason" class="form-input" required placeholder="e.g. Fresh Batch #42 Maturation Completed" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Internal Staff Notes (Optional)</label>
+          <input type="text" id="modal-stock-notes" class="form-input" placeholder="e.g. 50L carboy bottled into 500ml bottles" />
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 24px;">
+          <button type="button" class="btn btn-secondary" onclick="AdminApp.closeStockAdjustModal()" style="flex: 1;">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Confirm Adjustment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Threshold Modal -->
+  <div id="threshold-modal" class="modal-overlay" role="dialog">
+    <div class="modal-content-card" style="max-width: 440px; padding: 28px;">
+      <button class="modal-close-btn" onclick="AdminApp.closeThresholdModal()">✕</button>
+      <h3 style="font-family: var(--font-serif); font-size: 1.35rem; color: var(--color-moss-900); margin-bottom: 6px;">Set Low Stock Warning Alert</h3>
+      <p style="font-size: 0.8125rem; color: var(--color-text-muted); margin-bottom: 16px;">Trigger an alert banner when stock falls to or below this threshold.</p>
+
+      <form onsubmit="AdminApp.handleThresholdSubmit(event)">
+        <input type="hidden" id="modal-threshold-prod-id" />
+        <div class="form-group">
+          <label class="form-label">Alert Threshold (Units)</label>
+          <input type="number" id="modal-threshold-val" class="form-input" min="1" max="1000" required />
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn btn-secondary" onclick="AdminApp.closeThresholdModal()" style="flex: 1;">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Save Threshold</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Product Edit Modal -->
+  <div id="product-edit-modal" class="modal-overlay" role="dialog">
+    <div class="modal-content-card" style="max-width: 680px; padding: 32px; max-height: 90vh; overflow-y: auto;">
+      <button class="modal-close-btn" onclick="AdminApp.closeProductEditModal()">✕</button>
+      <h2 id="modal-prod-edit-title" style="font-family: var(--font-serif); font-size: 1.5rem; color: var(--color-moss-900); margin-bottom: 16px;"></h2>
+
+      <form onsubmit="AdminApp.handleProductFormSubmit(event)">
+        <input type="hidden" id="prod-form-id" />
+
+        <div class="form-group">
+          <label class="form-label">Product Name *</label>
+          <input type="text" id="prod-form-name" class="form-input" required placeholder="e.g. Citrus Bioenzyme Cleaner Concentrate" />
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">Category Code *</label>
+            <select id="prod-form-category" class="form-select">
+              <option value="concentrate">concentrate</option>
+              <option value="kitchen">kitchen</option>
+              <option value="floor">floor</option>
+              <option value="laundry">laundry</option>
+              <option value="shampoo">shampoo</option>
+              <option value="bundle">bundle</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category Display Label *</label>
+            <input type="text" id="prod-form-catlabel" class="form-input" required placeholder="e.g. Bioenzyme Concentrate" />
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">Base Retail Price (₹) *</label>
+            <input type="number" id="prod-form-price" class="form-input" required min="1" placeholder="249" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Base Package Size *</label>
+            <input type="text" id="prod-form-size" class="form-input" required placeholder="e.g. 500 ml" />
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">Initial / Current Stock *</label>
+            <input type="number" id="prod-form-stock" class="form-input" required min="0" placeholder="50" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Low Stock Threshold</label>
+            <input type="number" id="prod-form-threshold" class="form-input" required min="1" value="20" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Badge Tag (Optional)</label>
+            <input type="text" id="prod-form-badge" class="form-input" placeholder="e.g. Bestseller" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Image Asset Path *</label>
+          <input type="text" id="prod-form-image" class="form-input" required placeholder="assets/images/bioenzyme.jpg" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Short Description *</label>
+          <textarea id="prod-form-desc" class="form-input" rows="3" required placeholder="Concise overview of formulation..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Publication Status</label>
+          <select id="prod-form-status" class="form-select">
+            <option value="published">published (Live in Store)</option>
+            <option value="draft">draft (Hidden from Public)</option>
+            <option value="archived">archived</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 24px;">
+          <button type="button" class="btn btn-secondary" onclick="AdminApp.closeProductEditModal()" style="flex: 1;">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Article Edit Modal -->
+  <div id="article-edit-modal" class="modal-overlay" role="dialog">
+    <div class="modal-content-card" style="max-width: 720px; padding: 32px; max-height: 90vh; overflow-y: auto;">
+      <button class="modal-close-btn" onclick="AdminApp.closeArticleEditModal()">✕</button>
+      <h2 style="font-family: var(--font-serif); font-size: 1.5rem; color: var(--color-moss-900); margin-bottom: 16px;">Science & Journal Article Editor</h2>
+
+      <form onsubmit="AdminApp.handleArticleFormSubmit(event)">
+        <input type="hidden" id="art-form-id" />
+
+        <div class="form-group">
+          <label class="form-label">Article Title *</label>
+          <input type="text" id="art-form-title" class="form-input" required />
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">URL Slug</label>
+            <input type="text" id="art-form-slug" class="form-input" placeholder="auto-generated-from-title" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Author Name</label>
+            <input type="text" id="art-form-author" class="form-input" required />
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">Category / Tag</label>
+            <input type="text" id="art-form-tag" class="form-input" value="Bioenzyme Science" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Reading Time</label>
+            <input type="text" id="art-form-readtime" class="form-input" value="4 min read" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Excerpt / Summary *</label>
+          <textarea id="art-form-excerpt" class="form-input" rows="2" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Full Article Markdown / HTML Content *</label>
+          <textarea id="art-form-content" class="form-input" rows="8" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Publication Status</label>
+          <select id="art-form-status" class="form-select">
+            <option value="published">published (Live on Website)</option>
+            <option value="draft">draft</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 24px;">
+          <button type="button" class="btn btn-secondary" onclick="AdminApp.closeArticleEditModal()" style="flex: 1;">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Publish Article</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Admin User Modal -->
+  <div id="admin-user-modal" class="modal-overlay" role="dialog">
+    <div class="modal-content-card" style="max-width: 500px; padding: 32px;">
+      <button class="modal-close-btn" onclick="AdminApp.closeAddAdminModal()">✕</button>
+      <h2 style="font-family: var(--font-serif); font-size: 1.5rem; color: var(--color-moss-900); margin-bottom: 6px;">Add Team Member</h2>
+      <p style="font-size: 0.8125rem; color: var(--color-text-muted); margin-bottom: 20px;">Role-based access control for operations staff.</p>
+
+      <form onsubmit="AdminApp.handleAdminUserSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input type="text" id="user-form-name" class="form-input" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address *</label>
+          <input type="email" id="user-form-email" class="form-input" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Initial Password * (min 8 chars)</label>
+          <input type="password" id="user-form-password" class="form-input" minlength="8" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Role</label>
+          <select id="user-form-role" class="form-select">
+            <option value="admin">Operations Admin</option>
+            <option value="staff">Fulfillment Staff</option>
+            <option value="super_admin">Super Administrator</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Granular Permissions</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.8125rem; margin-top: 6px;">
+            <label><input type="checkbox" class="admin-perm-checkbox" value="inventory" checked /> Inventory & Stock</label>
+            <label><input type="checkbox" class="admin-perm-checkbox" value="cms_content" checked /> Content CMS</label>
+            <label><input type="checkbox" class="admin-perm-checkbox" value="products" checked /> Products Catalogue</label>
+            <label><input type="checkbox" class="admin-perm-checkbox" value="journal" checked /> Journal CMS</label>
+            <label><input type="checkbox" class="admin-perm-checkbox" value="enquiries" checked /> Leads / Enquiries</label>
+            <label><input type="checkbox" class="admin-perm-checkbox" value="reports" checked /> CSV Reports</label>
+            <label><input type="checkbox" class="admin-perm-checkbox" value="audit_log" checked /> Audit Logs</label>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 24px;">
+          <button type="button" class="btn btn-secondary" onclick="AdminApp.closeAddAdminModal()" style="flex: 1;">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Create Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="admin-toast-container" style="position: fixed; bottom: 24px; right: 24px; z-index: 9999;"></div>
+
+  <!-- Scripts -->
+  <script src="scripts/data.js"></script>
+  <script src="scripts/store.js"></script>
+  <script src="scripts/admin.js"></script>
+</body>
+</html>
